@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="id" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siberuna | Platform Belajar Keamanan Digital</title>
+  <meta name="description" content="Platform edukasi keamanan digital interaktif untuk pelajar dan masyarakat. Simulasi phishing, password checker, tantangan kasus siber, dan kuis gamifikasi.">
+  <link rel="icon" href="assets/images/logo.png" type="image/x-icon">
+  <script>
+    // Inisialisasi tema instan dari LocalStorage sebelum render DOM
+    try {
+      const savedState = localStorage.getItem("siberuna_data_v1") || localStorage.getItem("cyberquest_data_v1");
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        if (parsed?.user?.theme === "light") {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.classList.add("light");
+        }
+      }
+    } catch (e) {}
+  </script>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              dark: '#070B14',
+              navy: '#0B0F19',
+              slate: '#0F172A',
+              card: '#111827',
+              border: '#1E293B',
+              blue: '#2563EB',
+              cyan: '#06B6D4',
+              cyanLight: '#22D3EE'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#070B14] text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- BACKDROP OVERLAY UNTUK MOBILE SIDEBAR -->
+  <div id="mobile-menu-backdrop" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm hidden lg:hidden"></div>
+
+  <!-- SIDEBAR NAVIGASI (OFF-CANVAS DI MOBILE & DOCKED FIXED DI DESKTOP) -->
+  <aside id="app-sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-64 xl:w-72 bg-[#0B0F19] border-r border-slate-800/80 flex flex-col justify-between overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+    
+    <!-- Bagian Atas: Brand & Profil Singkat -->
+    <div class="p-5 border-b border-slate-800/80 space-y-4 shrink-0">
+      <!-- Logo & Tombol Tutup Mobile -->
+      <div class="flex items-center justify-between">
+        <a href="#home" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform shrink-0">
+            <img 
+              src="assets/images/logo.png" 
+              alt="Logo Siberuna"
+              class="w-full h-full object-cover"
+            >
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-lg font-black tracking-tight text-white">Siber<span class="text-cyan-400">una</span></span>
+              <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">2026</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-medium">Think Smart. Stay Secure.</p>
+          </div>
+        </a>
+        <!-- Tombol Tutup Sidebar (Berfungsi di Desktop & Mobile) -->
+        <button id="sidebar-close-btn" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition group" aria-label="Tutup Sidebar" title="Tutup Sidebar (Ctrl+B)">
+          <i data-lucide="chevron-left" class="w-5 h-5 hidden lg:block group-hover:-translate-x-0.5 transition-transform"></i>
+          <i data-lucide="x" class="w-5 h-5 lg:hidden"></i>
+        </button>
+      </div>
+
+      <!-- User Card Quick Info -->
+      <a href="#profile" data-view="profile" id="sidebar-user-card" class="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 transition group">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold shrink-0">
+            <i data-lucide="shield" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0">
+            <h4 id="header-user-name" class="text-xs font-bold text-white truncate group-hover:text-cyan-300 transition-colors">Cyber Explorer</h4>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span id="header-level-badge" class="text-[11px] font-bold text-cyan-400">🛡️ Lv.1</span>
+              <span class="text-[10px] text-slate-600">•</span>
+              <span id="header-xp-badge" class="text-[11px] font-mono font-bold text-amber-400">0 XP</span>
+            </div>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors shrink-0"></i>
+      </a>
+    </div>
+
+    <!-- Bagian Tengah: Menu Navigasi Berkelompok -->
+    <div class="flex-1 px-3 py-4 overflow-y-auto space-y-6 sidebar-nav">
+      
+      <!-- Group 1: Menu Utama -->
+      <div>
+        <span class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 sidebar-group-title">Menu Utama</span>
+        <div class="mt-2 space-y-1">
+          <a href="#home" data-view="home" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="home" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Home</span>
+          </a>
+          <a href="#dashboard" data-view="dashboard" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Dashboard</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Group 2: Lab & Praktik -->
+      <div>
+        <span class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 sidebar-group-title">Lab & Praktik</span>
+        <div class="mt-2 space-y-1">
+          <a href="#learning" data-view="learning" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="book-open" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Learning Center</span>
+          </a>
+          <a href="#phishing" data-view="phishing" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="mail-warning" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Phishing Simulator</span>
+          </a>
+          <a href="#password" data-view="password" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="key" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Password Checker</span>
+          </a>
+          <a href="#quiz" data-view="quiz" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="help-circle" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Cyber Quiz</span>
+          </a>
+          <a href="#challenge" data-view="challenge" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Cyber Challenge</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Group 3: Pengguna & Prestasi -->
+      <div>
+        <span class="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 sidebar-group-title">Pengguna</span>
+        <div class="mt-2 space-y-1">
+          <a href="#achievement" data-view="achievement" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="award" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Achievement</span>
+          </a>
+          <a href="#profile" data-view="profile" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i data-lucide="settings" class="w-4 h-4 shrink-0 group-hover:scale-110 transition-transform"></i>
+            <span>Profil & Setelan</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bagian Bawah: Footer Sidebar -->
+    <div id="sidebar-footer-box" class="p-4 border-t border-slate-800/80 bg-slate-950/40 text-[11px] text-slate-500 flex items-center justify-between shrink-0">
+      <div>
+        <p class="font-bold text-slate-300">Siberuna • 2026</p>
+        <p class="text-[10px] text-slate-400">Think Smart. Stay Secure.</p>
+      </div>
+      <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold">v1.0</span>
+    </div>
+
+  </aside>
+
+  <!-- CONTENT WRAPPER DENGAN OFFSET SIDEBAR DI DESKTOP -->
+  <div id="content-wrapper" class="lg:pl-64 xl:pl-72 flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 ease-in-out">
+    
+    <!-- Top Header Bar (Desktop & Mobile) -->
+    <header id="app-top-header" class="sticky top-0 z-30 bg-[#070B14]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-2.5 sm:px-6 flex items-center justify-between transition-colors">
+      <div class="flex items-center gap-3">
+        <!-- Tombol Buka / Tutup Sidebar -->
+        <button id="sidebar-toggle-btn" class="p-2 rounded-xl text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 transition focus:outline-none flex items-center gap-2 group" aria-label="Buka/Tutup Sidebar" title="Buka/Tutup Sidebar (Ctrl+B)">
+          <i data-lucide="menu" class="w-5 h-5 text-slate-300 group-hover:text-cyan-400 transition-colors"></i>
+        </button>
+
+        <!-- Brand Logo (Tampil di Mobile, atau di Desktop saat Sidebar Ditutup) -->
+        <a href="#home" id="top-brand-container" class="items-center gap-2 flex lg:hidden group">
+          <img src="assets/images/logo.png" alt="Logo Siberuna" class="w-7 h-7 rounded-lg object-cover group-hover:scale-105 transition-transform">
+          <span class="font-black text-white text-base">Siber<span class="text-cyan-400">una</span></span>
+        </a>
+
+        <!-- Breadcrumb / Indikator View Aktif di Desktop -->
+        <div class="hidden lg:flex items-center gap-2 text-xs text-slate-400 pl-1">
+          <span class="text-slate-600">/</span>
+          <span id="top-header-view-title" class="font-bold text-slate-200 capitalize">Home</span>
+        </div>
+      </div>
+
+      <!-- Status User & Profil Singkat -->
+      <div class="flex items-center gap-2.5">
+        <a href="#dashboard" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] hover:border-cyan-500/30 transition">
+          <span id="mobile-header-level-badge" class="font-bold text-cyan-400">🛡️ Lv.1</span>
+          <span class="text-slate-700">|</span>
+          <span id="mobile-header-xp-badge" class="font-mono font-bold text-amber-400">0 XP</span>
+        </a>
+      </div>
+    </header>
+
+  <!-- MAIN APPLICATION CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- VIEW A: LANDING PAGE (HOME) -->
+    <section id="home-view" class="view-section active space-y-20">
+      
+      <!-- HERO SECTION -->
+      <div class="relative pt-6 pb-12 sm:pt-12 sm:pb-20 text-center cyber-glow-cyan">
+
+        <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto">
+          Tingkatkan Literasi Keamanan Digital dengan <span class="bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-400 bg-clip-text text-transparent">Siberuna</span>
+        </h1>
+
+        <p class="mt-4 text-base sm:text-xl font-medium text-cyan-300 tracking-wide">
+          "Think Smart. Stay Secure."
+        </p>
+
+        <p class="mt-4 text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Platform edukasi keamanan digital interaktif yang mengubah proses belajar cybersecurity menjadi pengalaman nyata melalui simulasi investigasi phishing, audit kekuatan password, kuis gamifikasi, dan skenario tantangan siber.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="#learning" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-sm transition-all duration-200 shadow-xl shadow-cyan-500/25 flex items-center justify-center gap-2">
+            <i data-lucide="play-circle" class="w-5 h-5"></i>
+            <span>Mulai Belajar Sekarang</span>
+          </a>
+          <a href="#dashboard" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-sm transition flex items-center justify-center gap-2">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Buka Dashboard</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- FITUR UTAMA SECTION -->
+      <div class="space-y-8">
+        <div class="text-center max-w-2xl mx-auto">
+          <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Eksplorasi Fitur</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Ekosistem Edukasi Komprehensif</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-2">Seluruh modul dan instrumen dirancang interaktif tanpa sekadar teori pasif.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Card 1: Learning Center -->
+          <div class="cyber-card rounded-2xl p-6 border border-slate-800 flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="book-open" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">Learning Center</h3>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                8 modul kurikulum keamanan digital terstruktur: pilar CIA, phishing, kata sandi, rekayasa sosial, malware, safe browsing, privasi, dan 2FA lengkap dengan studi kasus nyata.
+              </p>
+            </div>
+            <a href="#learning" class="mt-6 text-xs font-bold text-cyan-400 flex items-center gap-1.5 hover:gap-2.5 transition-all">
+              <span>Buka Modul</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Card 2: Phishing Simulator -->
+          <div class="cyber-card rounded-2xl p-6 border border-slate-800 flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="mail-warning" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">Phishing Simulator</h3>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                Simulasi pesan email, SMS, dan WhatsApp nyata. Uji ketajaman Anda memeriksa alamat domain palsu, bahaya file APK trojan, dan tautan manipulatif.
+              </p>
+            </div>
+            <a href="#phishing" class="mt-6 text-xs font-bold text-amber-400 flex items-center gap-1.5 hover:gap-2.5 transition-all">
+              <span>Mulai Uji Forensik</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Card 3: Password Security Checker -->
+          <div class="cyber-card rounded-2xl p-6 border border-slate-800 flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="key" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">Password Security Checker</h3>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                Evaluasi entropi kata sandi, hitung estimasi waktu retas brute force komputer modern, dan gunakan generator kata sandi aman berbasis Passphrase (100% lokal di browser).
+              </p>
+            </div>
+            <a href="#password" class="mt-6 text-xs font-bold text-emerald-400 flex items-center gap-1.5 hover:gap-2.5 transition-all">
+              <span>Uji Kata Sandi</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Card 4: Cyber Quiz -->
+          <div class="cyber-card rounded-2xl p-6 border border-slate-800 flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="help-circle" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">Cyber Quiz (5 Kategori)</h3>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                50 pertanyaan pilihan ganda dengan timer hitung mundur per soal, penilaian otomatis, dan ulasan penjelasan edukatif untuk setiap opsi jawaban.
+              </p>
+            </div>
+            <a href="#quiz" class="mt-6 text-xs font-bold text-purple-400 flex items-center gap-1.5 hover:gap-2.5 transition-all">
+              <span>Ambil Kuis</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Card 5: Cyber Challenge -->
+          <div class="cyber-card rounded-2xl p-6 border border-slate-800 flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="shield-alert" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-rose-300 transition-colors">Cyber Challenge</h3>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                Tantangan berbasis skenario dilema nyata: web e-commerce flash sale palsu, jebakan Wi-Fi kafe, WhatsApp undangan pernikahan APK, dan respon akun diretas.
+              </p>
+            </div>
+            <a href="#challenge" class="mt-6 text-xs font-bold text-rose-400 flex items-center gap-1.5 hover:gap-2.5 transition-all">
+              <span>Hadapi Skenario</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Card 6: Gamifikasi & Achievements -->
+          <div class="cyber-card rounded-2xl p-6 border border-slate-800 flex flex-col justify-between group">
+            <div>
+              <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                <i data-lucide="award" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">Gamifikasi & Trofi</h3>
+              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                Tingkatkan reputasi Anda dari Beginner hingga Cyber Expert. Kumpulkan XP dan buka 9 lencana pencapaian eksklusif yang tersimpan permanen di LocalStorage.
+              </p>
+            </div>
+            <a href="#achievement" class="mt-6 text-xs font-bold text-cyan-400 flex items-center gap-1.5 hover:gap-2.5 transition-all">
+              <span>Lihat Trofi</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- MANFAAT EDUKASI KEAMANAN SIBER -->
+      <div class="p-8 sm:p-12 rounded-3xl bg-slate-900/50 border border-slate-800 cyber-glow-blue">
+        <div class="max-w-3xl mx-auto text-center space-y-4">
+          <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Pentingnya Literasi Digital</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Mengapa Keamanan Siber Penting Bagi Kita?</h2>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Di era hiperkonektivitas saat ini, kejahatan siber bukan lagi fiksi ilmiah. Lebih dari 85% insiden peretasan berawal dari faktor kelalaian manusia (Human Error) melalui phishing dan manipulasi psikologis.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10">
+          <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800/80">
+            <div class="text-cyan-400 mb-3"><i data-lucide="user-check" class="w-6 h-6"></i></div>
+            <h4 class="text-sm font-bold text-white">Perlindungan Identitas</h4>
+            <p class="text-xs text-slate-400 mt-1">Mencegah penyalahgunaan data KTP dan dokumen identitas untuk pinjaman online ilegal atau pemerasan.</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800/80">
+            <div class="text-emerald-400 mb-3"><i data-lucide="banknote" class="w-6 h-6"></i></div>
+            <h4 class="text-sm font-bold text-white">Keamanan Finansial</h4>
+            <p class="text-xs text-slate-400 mt-1">Mengamankan akun mobile banking, dompet digital, dan kode OTP dari pembajakan SMS sniffing.</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800/80">
+            <div class="text-purple-400 mb-3"><i data-lucide="shield" class="w-6 h-6"></i></div>
+            <h4 class="text-sm font-bold text-white">Ketahanan Institusi & Bangsa</h4>
+            <p class="text-xs text-slate-400 mt-1">Membentuk budaya kerja dan ruang belajar yang sadar risiko keamanan informasi (Security-First Mindset).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER BANNER CTA -->
+      <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-blue-900/50 via-slate-900 to-cyan-950/50 border border-cyan-500/30 text-center space-y-4">
+        <h3 class="text-2xl font-black text-white">Siap Menguji Naluri Pertahanan Digital Anda?</h3>
+        <p class="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
+          Mulai dari modul pertama dan buktikan kemampuan Anda dalam mengidentifikasi ancaman dunia maya.
+        </p>
+        <div>
+          <a href="#dashboard" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/30">
+            <span>Buka Dashboard Pengguna</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- VIEW B: DASHBOARD -->
+    <section id="dashboard-view" class="view-section space-y-8">
+      
+      <!-- Greeting & Top Banner -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div id="dash-greeting">
+          <!-- Rendered dynamically -->
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="#learning" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold flex items-center gap-2 shadow-sm">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>Lanjut Belajar</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Level Card with Progress Bar -->
+      <div id="dash-level-card" class="cyber-card rounded-2xl p-6 border border-slate-800">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Real Stats Grid -->
+      <div id="dash-stats-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Daily Challenge Card -->
+      <div id="dash-daily-challenge">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Learning Path & Recent Achievements Split -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-3">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jalur Pembelajaran Anda</h4>
+          <div id="dash-learning-path">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pencapaian Terbaru</h4>
+            <a href="#achievement" class="text-xs text-cyan-400 hover:underline">Lihat Semua</a>
+          </div>
+          <div id="dash-recent-achievements" class="space-y-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Shortcuts Grid -->
+      <div class="space-y-3 pt-4 border-t border-slate-800">
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Akses Cepat Laboratorium Siber</h4>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <a href="#phishing" class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-amber-500/40 transition flex items-center gap-2.5">
+            <i data-lucide="mail-warning" class="w-4 h-4 text-amber-400"></i>
+            <span class="text-xs font-semibold text-slate-300">Phishing Sim</span>
+          </a>
+          <a href="#password" class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition flex items-center gap-2.5">
+            <i data-lucide="key" class="w-4 h-4 text-emerald-400"></i>
+            <span class="text-xs font-semibold text-slate-300">Password Audit</span>
+          </a>
+          <a href="#quiz" class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-purple-500/40 transition flex items-center gap-2.5">
+            <i data-lucide="help-circle" class="w-4 h-4 text-purple-400"></i>
+            <span class="text-xs font-semibold text-slate-300">Cyber Quiz</span>
+          </a>
+          <a href="#challenge" class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-rose-500/40 transition flex items-center gap-2.5">
+            <i data-lucide="shield-alert" class="w-4 h-4 text-rose-400"></i>
+            <span class="text-xs font-semibold text-slate-300">Tantangan Kasus</span>
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- VIEW C: LEARNING CENTER -->
+    <section id="learning-view" class="view-section space-y-8">
+      
+      <!-- Header with Filter & Search -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <h2 class="text-2xl font-black text-white">Learning Center</h2>
+          <p class="text-xs text-slate-400 mt-1">8 modul kurikulum keamanan digital. Tuntaskan materi dan evaluasi untuk mendapatkan +50 XP per modul.</p>
+        </div>
+
+        <!-- Search Input -->
+        <div class="w-full md:w-72 relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" 
+                 oninput="window.learningController.setSearchQuery(this.value)"
+                 placeholder="Cari materi atau topik..." 
+                 class="w-full pl-9 pr-4 py-2 bg-slate-900/90 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50">
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div id="learning-categories" class="flex items-center gap-2 overflow-x-auto pb-2">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Modules Grid -->
+      <div id="learning-module-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </section>
+
+    <!-- VIEW D: PHISHING SIMULATOR -->
+    <section id="phishing-view" class="view-section space-y-6">
+      
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-2xl font-black text-white">Phishing Simulator</h2>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase">
+              Simulasi Forensik
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Uji kejelian Anda mengenali pesan phishing berbahaya vs pesan resmi institusi (+15 XP per jawaban benar).</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span id="phishing-score-badge" class="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-cyan-400">
+            0 / 8 Teridentifikasi
+          </span>
+        </div>
+      </div>
+
+      <!-- Disclaimer Banner -->
+      <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-400 flex items-center gap-2.5">
+        <i data-lucide="info" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+        <span>Seluruh data pesan, pengirim, dan nomor di bawah ini adalah data simulasi fiktif untuk tujuan edukasi. Tidak ada pesan sungguhan yang dikirim atau dikumpulkan.</span>
+      </div>
+
+      <!-- Case Selection Pills -->
+      <div id="phishing-case-nav" class="flex items-center gap-2 overflow-x-auto pb-2">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Main Viewer Card -->
+      <div id="phishing-viewer-card" class="cyber-card rounded-2xl p-6 border border-slate-800">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </section>
+
+    <!-- VIEW E: PASSWORD CHECKER -->
+    <section id="password-view" class="view-section space-y-8 max-w-4xl mx-auto">
+      
+      <!-- Header -->
+      <div class="text-center space-y-2 pb-4 border-b border-slate-800">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-semibold">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          <span>100% Client-Side • Tanpa Database • Zero-Storage</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-white">Password Security Checker</h2>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
+          Evaluasi ketahanan kata sandi Anda dari serangan Brute-Force, hitung nilai entropi matematis, dan buat Passphrase kuat yang mudah diingat.
+        </p>
+      </div>
+
+      <!-- Main Checker Card -->
+      <div class="cyber-card rounded-2xl p-6 sm:p-8 border border-slate-800 space-y-6">
+        
+        <!-- Input Field with Show/Hide -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xs">
+            <label for="pwd-input" class="font-bold text-slate-300">Ketik Kata Sandi untuk Diuji:</label>
+            <div id="pwd-score-badge">
+              <span class="text-slate-500">Belum diisi</span>
+            </div>
+          </div>
+
+          <div class="relative">
+            <input type="password" 
+                   id="pwd-input"
+                   placeholder="Masukkan kata sandi percobaan di sini..."
+                   autocomplete="off"
+                   class="w-full px-4 py-3 pr-12 rounded-xl bg-slate-900 border border-slate-700/80 text-white font-mono text-sm placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition">
+            
+            <button id="pwd-toggle-visibility" 
+                    type="button"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-white transition"
+                    title="Tampilkan / Sembunyikan">
+              <i id="pwd-toggle-icon" data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Strength Meter Bars -->
+        <div class="space-y-2">
+          <div id="pwd-strength-meter" class="flex gap-2">
+            <div class="flex-1 h-2 rounded-full bg-slate-800"></div>
+            <div class="flex-1 h-2 rounded-full bg-slate-800"></div>
+            <div class="flex-1 h-2 rounded-full bg-slate-800"></div>
+            <div class="flex-1 h-2 rounded-full bg-slate-800"></div>
+            <div class="flex-1 h-2 rounded-full bg-slate-800"></div>
+          </div>
+          <div id="pwd-crack-time" class="text-xs text-slate-400 font-medium">
+            Masukkan kata sandi untuk menganalisis
+          </div>
+        </div>
+
+        <!-- Criteria Checklist -->
+        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2.5">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Standar Keamanan NIST & Indikator Kekuatan:</span>
+          <div id="pwd-criteria-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Smart Recommendations -->
+        <div class="space-y-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Rekomendasi Ahli:</span>
+          <div id="pwd-recommendations" class="space-y-2">
+            <p class="text-xs text-slate-500">Ketik kata sandi untuk mendapatkan tips penguatan.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Password Generator Card -->
+      <div class="cyber-card rounded-2xl p-6 sm:p-8 border border-slate-800 space-y-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Generator Kata Sandi Berdaya Tahan Tinggi</h3>
+            <p class="text-xs text-slate-400">Buat Passphrase acak yang mustahil ditembus brute-force namun mudah Anda visualisasikan.</p>
+          </div>
+        </div>
+
+        <!-- Mode Generator Radio -->
+        <div class="flex items-center gap-4 text-xs font-medium text-slate-300">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="pwd-gen-mode" value="passphrase" checked class="accent-cyan-400">
+            <span>Passphrase 4 Kata (Sangat Direkomendasikan)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="pwd-gen-mode" value="alphanumeric" class="accent-cyan-400">
+            <span>Acak Huruf & Simbol (16 Karakter)</span>
+          </label>
+        </div>
+
+        <!-- Generated Output -->
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <input type="text" 
+                 id="pwd-generated-output" 
+                 readonly 
+                 placeholder="Klik tombol untuk men-generate password..."
+                 class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 font-mono text-xs sm:text-sm text-cyan-300 font-semibold focus:outline-none">
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button id="pwd-generate-btn" 
+                    type="button"
+                    class="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-xs whitespace-nowrap transition flex items-center justify-center gap-1.5 shadow-md shadow-cyan-500/20">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              <span>Generate Baru</span>
+            </button>
+
+            <button id="pwd-copy-btn" 
+                    type="button"
+                    class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center justify-center gap-1.5"
+                    title="Salin ke Clipboard">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span>Salin</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-500 italic">
+          * Catatan: Hasil pemeriksaan ini bersifat edukatif dan bukan jaminan mutlak bahwa kata sandi kebal dari segala metode pencurian data (seperti phishing atau malware infostealer).
+        </p>
+      </div>
+
+    </section>
+
+    <!-- VIEW F: CYBER QUIZ -->
+    <section id="quiz-view" class="view-section space-y-6">
+      
+      <!-- Container Utama Kuis Dinamis -->
+      <div id="quiz-main-container">
+        <!-- Rendered dynamically (Category cards / Question view / Result view) -->
+      </div>
+
+    </section>
+
+    <!-- VIEW G: CYBER CHALLENGE -->
+    <section id="challenge-view" class="view-section space-y-6">
+      
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <h2 class="text-2xl font-black text-white">Cyber Challenge</h2>
+          <p class="text-xs text-slate-400 mt-1">Uji pengambilan keputusan Anda pada 5 skenario insiden siber dunia nyata (+40 XP per skenario).</p>
+        </div>
+
+        <span id="challenge-progress-badge" class="px-3.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-amber-400">
+          0 / 5 Skenario Tuntas
+        </span>
+      </div>
+
+      <!-- Split Layout: Sidebar Skenario & Main Decision Area -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <!-- Sidebar Navigation List -->
+        <div class="space-y-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pilih Skenario Kasus:</span>
+          <div id="challenge-nav-list" class="space-y-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Main Scenario View -->
+        <div class="lg:col-span-2">
+          <div id="challenge-scenario-view">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- VIEW H: ACHIEVEMENT -->
+    <section id="achievement-view" class="view-section space-y-6">
+      
+      <!-- Summary Card -->
+      <div id="achievement-summary-card">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Filter Tabs -->
+      <div id="achievement-filter-tabs" class="flex items-center gap-2">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Grid Badges -->
+      <div id="achievement-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </section>
+
+    <!-- VIEW I: PROFILE & SETTINGS -->
+    <section id="profile-view" class="view-section space-y-6 max-w-3xl mx-auto">
+      
+      <!-- Header -->
+      <div class="pb-4 border-b border-slate-800">
+        <h2 class="text-2xl font-black text-white">Profil & Pengaturan Akun</h2>
+        <p class="text-xs text-slate-400 mt-1">Kelola identitas agen, tinjau ringkasan statistik belajar, dan preferensi antarmuka.</p>
+      </div>
+
+      <!-- User Card -->
+      <div class="cyber-card rounded-2xl p-6 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div id="profile-level-badge" class="flex items-center gap-4">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div class="text-right">
+          <span class="text-xs text-slate-400">Total Akumulasi XP</span>
+          <div id="profile-total-xp" class="text-2xl font-black text-amber-400">0</div>
+        </div>
+      </div>
+
+      <!-- Detailed Analytics Grid -->
+      <div class="space-y-2">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Statistik Aktivitas Anda:</span>
+        <div id="profile-detailed-stats">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Settings Form -->
+      <div class="cyber-card rounded-2xl p-6 border border-slate-800 space-y-5">
+        <h4 class="text-sm font-bold text-white">Pengaturan Pengguna</h4>
+
+        <div class="space-y-4">
+          <!-- Input Nama -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Tampilan Agen:</label>
+            <input type="text" 
+                   id="profile-name-input"
+                   maxlength="30"
+                   class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-cyan-400">
+          </div>
+
+          <!-- Theme Mode Switcher (Dark & Light Mode) -->
+          <div class="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="text-xs font-semibold text-slate-200 block">Tema Tampilan (Mode Tampilan)</span>
+              <span class="text-[11px] text-slate-400 block mt-0.5">Pilih mode tampilan Gelap (Dark Mode) atau Terang (Light Mode)</span>
+            </div>
+            <div id="profile-theme-selector" class="inline-flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800 shrink-0 self-start sm:self-auto">
+              <button type="button" 
+                      id="theme-btn-dark"
+                      onclick="window.cyberApp.setTheme('dark')"
+                      class="px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-md shadow-cyan-500/30">
+                <i data-lucide="moon" class="w-4 h-4"></i>
+                <span>Dark Mode</span>
+              </button>
+              <button type="button" 
+                      id="theme-btn-light"
+                      onclick="window.cyberApp.setTheme('light')"
+                      class="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all text-slate-400 hover:text-white">
+                <i data-lucide="sun" class="w-4 h-4"></i>
+                <span>Light Mode</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex justify-end">
+          <button onclick="window.cyberApp.saveProfileSettings()"
+                  class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-xs transition shadow-md shadow-cyan-500/20">
+            Simpan Perubahan
+          </button>
+        </div>
+      </div>
+
+      <!-- Danger Zone: Reset Progress -->
+      <div class="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h4 class="text-sm font-bold text-rose-300">Zona Bahaya: Reset Progres</h4>
+          <p class="text-xs text-slate-400 mt-0.5">Hapus seluruh data belajar, XP, level, dan achievement dari LocalStorage untuk memulai dari awal.</p>
+        </div>
+        <button onclick="window.cyberApp.confirmResetProgress()"
+                class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition shrink-0"
+                style="color: #ffffff !important;">
+          Reset Seluruh Progres
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-20 border-t border-slate-800/80 bg-[#070B14]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-300">Siberuna</span>
+          <span>•</span>
+          <span>"Think Smart. Stay Secure."</span>
+        </div>
+        <div class="text-center md:text-left">
+            <span>Dibangun untuk meningkatkan kesadaran dan literasi keamanan digital.</span>
+        </div>
+        <div class="flex items-center gap-4 text-slate-400">
+          <a href="#learning" class="hover:text-cyan-400">Modul</a>
+          <a href="#phishing" class="hover:text-cyan-400">Simulator</a>
+          <a href="#password" class="hover:text-cyan-400">Password</a>
+          <a href="#quiz" class="hover:text-cyan-400">Kuis</a>
+        </div>
+      </div>
+    </footer>
+
+  </div> <!-- AKHIR CONTENT WRAPPER -->
+
+  <!-- MODULE READER MODAL -->
+  <div id="module-reader-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-6 modal-backdrop hidden">
+    <div class="cyber-card rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col border border-slate-800 shadow-2xl overflow-hidden animate-slide-up">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/80">
+        <div>
+          <div id="modal-module-meta" class="flex items-center gap-2 mb-1">
+            <!-- Rendered dynamically -->
+          </div>
+          <h3 id="modal-module-title" class="text-base sm:text-lg font-bold text-white">
+            <!-- Rendered dynamically -->
+          </h3>
+        </div>
+        <button onclick="window.learningController.closeModuleModal()" 
+                class="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Tabs Navigation -->
+      <div id="modal-module-tabs" class="flex items-center border-b border-slate-800 bg-slate-950/60 overflow-x-auto px-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Modal Scrollable Content -->
+      <div id="modal-module-content" class="p-6 overflow-y-auto flex-1 space-y-6">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- SCRIPT DATA & MODULES -->
+  <script src="data/modules.js"></script>
+  <script src="data/questions.js"></script>
+  <script src="data/challenges.js"></script>
+  
+  <!-- SCRIPT CONTROLLERS -->
+  <script src="js/storage.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/learning.js"></script>
+  <script src="js/phishing.js"></script>
+  <script src="js/password.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/challenge.js"></script>
+  <script src="js/achievement.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Inisialisasi ikon Lucide
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
+

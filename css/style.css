@@ -1,0 +1,905 @@
+/* Siberuna Custom Styles & Micro-Interactions */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --cq-navy: #0B0F19;
+  --cq-navy-light: #111827;
+  --cq-navy-card: #151D30;
+  --cq-border: #1E293B;
+  --cq-border-glow: #22D3EE;
+  --cq-blue: #2563EB;
+  --cq-cyan: #06B6D4;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #070B14;
+  color: #F1F5F9;
+  overflow-x: hidden;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0F19;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Glassmorphism & Cyber Card Effects */
+.cyber-card {
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cyber-card:hover {
+  border-color: rgba(34, 211, 238, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.08);
+}
+
+.cyber-card-active {
+  border-color: rgba(34, 211, 238, 0.6);
+  box-shadow: 0 0 20px -3px rgba(34, 211, 238, 0.15);
+}
+
+/* Subtle Gradient Glow Backgrounds */
+.cyber-glow-cyan {
+  background: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+}
+
+.cyber-glow-blue {
+  background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.12) 0%, transparent 70%);
+}
+
+/* Animations */
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s infinite ease-in-out;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Nav Item Styling */
+.nav-link {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.nav-link.active {
+  color: #38BDF8;
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #38BDF8, #818CF8);
+  border-radius: 9999px;
+}
+
+/* Sidebar Navigasi Styling */
+#app-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #1E293B transparent;
+}
+
+#app-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+#app-sidebar::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+
+.sidebar-nav .nav-link {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-nav .nav-link:hover {
+  background-color: rgba(30, 41, 59, 0.6);
+  color: #F8FAFC;
+}
+
+.sidebar-nav .nav-link.active {
+  color: #38BDF8 !important;
+  background: rgba(14, 165, 233, 0.12) !important;
+  border-left: 3px solid #38BDF8 !important;
+  font-weight: 700;
+  box-shadow: 0 2px 12px -2px rgba(14, 165, 233, 0.2);
+}
+
+.sidebar-nav .nav-link.active::after {
+  display: none !important; /* Hilangkan underline horizontal navbar untuk sidebar */
+}
+
+.sidebar-nav .nav-link.active i {
+  color: #38BDF8 !important;
+}
+
+/* ========================================================
+   DESKTOP COLLAPSIBLE SIDEBAR RULES
+   ======================================================== */
+@media (min-width: 1024px) {
+  #app-sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  #content-wrapper {
+    transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* Saat Sidebar Ditutup di Layar Desktop/Laptop */
+  body.sidebar-collapsed #app-sidebar {
+    transform: translateX(-100%) !important;
+  }
+
+  body.sidebar-collapsed #content-wrapper {
+    padding-left: 0 !important;
+  }
+
+  /* Munculkan logo brand di header atas saat sidebar ditutup di desktop */
+  body.sidebar-collapsed #top-brand-container {
+    display: flex !important;
+  }
+}
+
+/* Mock Phishing Message Viewer */
+.mock-email-container {
+  background-color: #0F172A;
+  border-radius: 12px;
+  border: 1px solid #1E293B;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.mock-link {
+  cursor: pointer;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.mock-link:hover {
+  opacity: 0.85;
+}
+
+/* Password Strength Indicator Bars */
+.strength-bar {
+  height: 6px;
+  border-radius: 3px;
+  background-color: #1E293B;
+  transition: all 0.3s ease;
+}
+
+/* Custom Modal Backdrop */
+.modal-backdrop {
+  background-color: rgba(7, 11, 20, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+/* Toast Container */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast-item {
+  pointer-events: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: slideUpFade 0.3s ease forwards;
+}
+
+/* Hide helper for SPA views */
+.view-section {
+  display: none;
+}
+
+.view-section.active {
+  display: block;
+}
+
+/* ========================================================
+   ADAPTIVE CONTRAST & THEME ENGINE (DARK & LIGHT MODE)
+   Menjamin teks di SEMUA mode (Dark & Light) memiliki kontras
+   tinggi dan keterbacaan (readability) yang sempurna sesuai standar WCAG.
+   ======================================================== */
+
+/* ---------- DARK MODE TEXT ENHANCEMENTS ---------- */
+html.dark body {
+  background-color: #070B14;
+  color: #F1F5F9;
+}
+
+html.dark .text-slate-400 {
+  color: #94A3B8 !important;
+}
+
+html.dark .text-slate-300 {
+  color: #CBD5E1 !important;
+}
+
+html.dark .text-slate-200 {
+  color: #E2E8F0 !important;
+}
+
+html.dark .text-slate-500 {
+  color: #64748B !important;
+}
+
+/* ---------- LIGHT MODE SYSTEM ---------- */
+html.light body {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+}
+
+/* Header & Navigasi */
+html.light header {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .nav-link {
+  color: #475569 !important;
+}
+
+html.light .nav-link:hover {
+  color: #0F172A !important;
+}
+
+html.light .nav-link.active {
+  color: #0284C7 !important;
+  font-weight: 700 !important;
+}
+
+html.light .nav-link.active::after {
+  background: linear-gradient(90deg, #0284C7, #2563EB) !important;
+}
+
+/* Header Badges */
+html.light #header-level-badge {
+  color: #0369A1 !important;
+}
+
+html.light #header-xp-badge {
+  color: #B45309 !important;
+}
+
+html.light #header-user-name {
+  color: #0F172A !important;
+}
+
+html.light a[href="#dashboard"].bg-slate-900\/80 {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+}
+
+html.light a[href="#profile"].bg-slate-800 {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+html.light a[href="#profile"].bg-slate-800:hover {
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Mobile Drawer */
+html.light #mobile-menu-drawer {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light #mobile-menu-drawer .nav-link {
+  color: #334155 !important;
+}
+
+html.light #mobile-menu-drawer .nav-link:hover {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+/* Kartu Cyber Card & Surfaces */
+html.light .cyber-card {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+html.light .cyber-card:hover {
+  border-color: #0284C7 !important;
+  box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.12) !important;
+}
+
+html.light .cyber-card-active {
+  border-color: #0284C7 !important;
+  box-shadow: 0 0 20px -3px rgba(2, 132, 199, 0.2) !important;
+}
+
+/* Glow Backgrounds */
+html.light .cyber-glow-cyan {
+  background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.08) 0%, transparent 70%) !important;
+}
+
+html.light .cyber-glow-blue {
+  background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.06) 0%, transparent 70%) !important;
+}
+
+/* Remap Background Gelap Tailwind ke Light Surface */
+html.light .bg-slate-950,
+html.light .bg-slate-950\/60,
+html.light .bg-slate-950\/80,
+html.light .bg-slate-900,
+html.light .bg-slate-900\/40,
+html.light .bg-slate-900\/50,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/90,
+html.light .bg-\[\#0B0F19\],
+html.light .bg-\[\#070B14\] {
+  background-color: #F8FAFC !important;
+}
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/40,
+html.light .bg-slate-800\/50,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/80,
+html.light .bg-slate-800\/90 {
+  background-color: #F1F5F9 !important;
+}
+
+html.light .bg-slate-700,
+html.light .bg-slate-700\/40,
+html.light .bg-slate-700\/50 {
+  background-color: #E2E8F0 !important;
+}
+
+/* Remap Border Gelap ke Border Terang */
+html.light .border-slate-800,
+html.light .border-slate-800\/40,
+html.light .border-slate-800\/50,
+html.light .border-slate-800\/60,
+html.light .border-slate-800\/70,
+html.light .border-slate-800\/80,
+html.light .border-slate-700,
+html.light .border-slate-700\/40,
+html.light .border-slate-700\/50,
+html.light .border-slate-700\/60,
+html.light .border-slate-700\/80 {
+  border-color: #E2E8F0 !important;
+}
+
+/* ========================================================
+   PENYESUAIAN WARNA TEKS MODE TERANG (HIGH CONTRAST)
+   ======================================================== */
+
+/* 1. Judul & Heading Utama */
+html.light h1:not([class*="text-transparent"]),
+html.light h2:not([class*="text-transparent"]),
+html.light h3:not([class*="text-transparent"]),
+html.light h4:not([class*="text-transparent"]),
+html.light h5:not([class*="text-transparent"]),
+html.light h6:not([class*="text-transparent"]) {
+  color: #0F172A !important;
+}
+
+/* 2. Teks Putih yang Harus Gelap di Light Mode */
+html.light .text-white {
+  color: #0F172A !important;
+}
+
+/* KECUALI Tombol & Badge dengan Latar Belakang Berwarna Solid / Gradien - HARUS TETAP PUTIH */
+html.light .bg-rose-600,
+html.light .bg-rose-600 *,
+html.light .bg-rose-500,
+html.light .bg-rose-500 *,
+html.light button.bg-rose-600,
+html.light button.bg-rose-600 *,
+html.light [onclick*="confirmResetProgress"],
+html.light [onclick*="confirmResetProgress"] *,
+html.light [onclick*="executeResetProgress"],
+html.light [onclick*="executeResetProgress"] *,
+html.light .bg-blue-600,
+html.light .bg-blue-600 *,
+html.light .bg-cyan-500,
+html.light .bg-cyan-500 *,
+html.light .bg-emerald-600,
+html.light .bg-emerald-600 *,
+html.light .bg-emerald-500,
+html.light .bg-emerald-500 *,
+html.light .bg-amber-500,
+html.light .bg-amber-500 *,
+html.light button.bg-gradient-to-r,
+html.light button.bg-gradient-to-r *,
+html.light a.bg-gradient-to-r,
+html.light a.bg-gradient-to-r *,
+html.light [class*="bg-gradient-to-r"] button,
+html.light [class*="bg-gradient-to-r"] span {
+  color: #FFFFFF !important;
+}
+
+/* 3. Teks Tubuh & Konten (Body, Paragraf, Keterangan) */
+html.light .text-slate-100,
+html.light .text-slate-200 {
+  color: #1E293B !important; /* Slate-800, kontras sangat tajam */
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important; /* Slate-700, nyaman dibaca dan tidak pudar */
+}
+
+html.light .text-slate-400 {
+  color: #475569 !important; /* Slate-600, kontras > 7:1 di latar putih */
+}
+
+html.light .text-slate-500 {
+  color: #64748B !important; /* Slate-500, kontras > 4.5:1 */
+}
+
+html.light .hover\:text-white:hover {
+  color: #0F172A !important;
+}
+
+/* 4. Penyesuaian Warna Aksen Agar Tidak Pudar di Latar Terang */
+
+/* Cyan & Teal Accents (Dari pastel #22d3ee ke deep teal/sky #0284C7 / #0369A1) */
+html.light .text-cyan-400,
+html.light .text-cyan-300,
+html.light .text-cyan-200 {
+  color: #0284C7 !important;
+}
+
+html.light a.text-cyan-400,
+html.light button.text-cyan-400 {
+  color: #0284C7 !important;
+}
+
+html.light a.text-cyan-400:hover,
+html.light button.text-cyan-400:hover {
+  color: #0369A1 !important;
+}
+
+/* Amber & Gold Accents (Dari kuning silau #fbbf24 ke deep rich amber #B45309) */
+html.light .text-amber-400,
+html.light .text-amber-300,
+html.light .text-amber-200 {
+  color: #B45309 !important;
+}
+
+html.light a.text-amber-400,
+html.light button.text-amber-400 {
+  color: #B45309 !important;
+}
+
+/* Emerald & Green Accents (Dari mint #34d399 ke deep emerald #047857) */
+html.light .text-emerald-400,
+html.light .text-emerald-300,
+html.light .text-emerald-200 {
+  color: #047857 !important;
+}
+
+html.light a.text-emerald-400,
+html.light button.text-emerald-400 {
+  color: #047857 !important;
+}
+
+/* Rose & Red Accents (Dari pink muda #fb7185 ke deep rose #BE123C) */
+html.light .text-rose-400,
+html.light .text-rose-300,
+html.light .text-rose-200,
+html.light .text-red-400,
+html.light .text-red-300 {
+  color: #BE123C !important;
+}
+
+html.light a.text-rose-400,
+html.light button.text-rose-400 {
+  color: #BE123C !important;
+}
+
+/* Purple & Violet Accents (Dari lavender muda ke deep royal purple #7E22CE) */
+html.light .text-purple-400,
+html.light .text-purple-300,
+html.light .text-purple-200 {
+  color: #7E22CE !important;
+}
+
+html.light a.text-purple-400,
+html.light button.text-purple-400 {
+  color: #7E22CE !important;
+}
+
+/* Blue Accents */
+html.light .text-blue-400,
+html.light .text-blue-300 {
+  color: #1D4ED8 !important;
+}
+
+/* 5. Penyesuaian Badge & Tag (Latar Pastel Lembut + Teks Tebal Tajam) */
+html.light .bg-cyan-500\/10,
+html.light .bg-cyan-500\/20 {
+  background-color: #E0F2FE !important;
+  border-color: #BAE6FD !important;
+}
+html.light .bg-cyan-500\/10 *,
+html.light .bg-cyan-500\/20 * {
+  color: #0369A1 !important;
+}
+
+html.light .bg-amber-500\/10,
+html.light .bg-amber-500\/20 {
+  background-color: #FEF3C7 !important;
+  border-color: #FDE68A !important;
+}
+html.light .bg-amber-500\/10 *,
+html.light .bg-amber-500\/20 * {
+  color: #92400E !important;
+}
+
+html.light .bg-emerald-500\/10,
+html.light .bg-emerald-500\/20 {
+  background-color: #D1FAE5 !important;
+  border-color: #A7F3D0 !important;
+}
+html.light .bg-emerald-500\/10 *,
+html.light .bg-emerald-500\/20 * {
+  color: #065F46 !important;
+}
+
+html.light .bg-rose-500\/10,
+html.light .bg-rose-500\/20,
+html.light .bg-red-500\/10,
+html.light .bg-red-500\/20 {
+  background-color: #FFE4E6 !important;
+  border-color: #FECDD3 !important;
+}
+html.light .bg-rose-500\/10 *,
+html.light .bg-rose-500\/20 *,
+html.light .bg-red-500\/10 *,
+html.light .bg-red-500\/20 * {
+  color: #9F1239 !important;
+}
+
+html.light .bg-purple-500\/10,
+html.light .bg-purple-500\/20 {
+  background-color: #F3E8FF !important;
+  border-color: #E9D5FF !important;
+}
+html.light .bg-purple-500\/10 *,
+html.light .bg-purple-500\/20 * {
+  color: #6B21A8 !important;
+}
+
+html.light .bg-blue-500\/10,
+html.light .bg-blue-500\/20 {
+  background-color: #DBEAFE !important;
+  border-color: #BFDBFE !important;
+}
+html.light .bg-blue-500\/10 *,
+html.light .bg-blue-500\/20 * {
+  color: #1E40AF !important;
+}
+
+/* ========================================================
+   PENYESUAIAN SPESIFIK TIAP KOMPONEN APLIKASI
+   ======================================================== */
+
+/* Formulir, Pencarian & Input Teks */
+html.light input[type="text"],
+html.light input[type="password"],
+html.light input[type="search"],
+html.light textarea {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+html.light input:focus,
+html.light textarea:focus {
+  border-color: #0284C7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+}
+
+/* Learning Center Filter Pills */
+html.light .cat-pill:not(.active) {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+html.light .cat-pill:not(.active):hover {
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Learning Center Modal Reader */
+html.light #module-reader-modal .bg-slate-900\/80,
+html.light #module-reader-modal .bg-slate-950\/40 {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light #modal-module-title {
+  color: #0F172A !important;
+}
+
+html.light #modal-module-content {
+  color: #1E293B !important;
+}
+
+html.light #modal-module-content p {
+  color: #334155 !important;
+  line-height: 1.65;
+}
+
+html.light #modal-module-content h4,
+html.light #modal-module-content h3 {
+  color: #0F172A !important;
+}
+
+/* Phishing Simulator Message Container */
+html.light .mock-email-container {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+  color: #0F172A !important;
+}
+
+html.light .mock-email-container * {
+  color: #1E293B;
+}
+
+html.light #phishing-message-content {
+  color: #0F172A !important;
+}
+
+html.light #phishing-message-content p,
+html.light #phishing-message-content div {
+  color: #1E293B !important;
+}
+
+html.light #phishing-message-content strong,
+html.light #phishing-message-content b {
+  color: #0F172A !important;
+}
+
+html.light #url-status-bar {
+  border-color: #E2E8F0 !important;
+  color: #475569 !important;
+}
+
+html.light #url-status-text {
+  color: #334155 !important;
+}
+
+/* Password Checker Components */
+html.light .strength-bar {
+  background-color: #E2E8F0 !important;
+}
+
+html.light #pwd-criteria-list li {
+  color: #334155 !important;
+}
+
+/* Cyber Quiz Question & Options */
+html.light #quiz-view button[onclick*="selectAnswer"] {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light #quiz-view button[onclick*="selectAnswer"]:hover {
+  background-color: #F8FAFC !important;
+  border-color: #0284C7 !important;
+}
+
+html.light #quiz-view button[onclick*="selectAnswer"] span {
+  color: inherit;
+}
+
+/* Penjelasan Edukatif Kuis */
+html.light #quiz-view .bg-slate-950\/80 {
+  background-color: #F0FDFA !important;
+  border-color: #99F6E4 !important;
+}
+
+html.light #quiz-view .bg-slate-950\/80 span.font-bold {
+  color: #0F766E !important;
+}
+
+html.light #quiz-view .bg-slate-950\/80 p {
+  color: #134E4A !important;
+}
+
+/* Cyber Challenge Dilemma & Clues */
+html.light #challenge-scenario-view p {
+  color: #334155 !important;
+}
+
+html.light #challenge-scenario-view ul li span {
+  color: #1E293B !important;
+}
+
+html.light #challenge-scenario-view button[onclick*="selectOption"] {
+  background-color: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+html.light #challenge-scenario-view button[onclick*="selectOption"]:hover {
+  background-color: #F8FAFC !important;
+  border-color: #0284C7 !important;
+}
+
+/* Toast Notifications */
+html.light .toast-item {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light .toast-item h5 {
+  color: #0F172A !important;
+}
+
+html.light .toast-item p {
+  color: #475569 !important;
+}
+
+/* Modal Popup Backdrop */
+html.light .modal-backdrop {
+  background-color: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Footer */
+html.light footer.bg-\[\#070B14\] {
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light footer span,
+html.light footer a {
+  color: #475569 !important;
+}
+
+html.light footer .font-bold {
+  color: #0F172A !important;
+}
+
+html.light footer a:hover {
+  color: #0284C7 !important;
+}
+
+/* Theme Selector di Halaman Profil */
+html.light #profile-theme-selector {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* Sidebar Navigasi & Mobile Header di Light Mode */
+html.light #app-sidebar {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.light #app-top-header,
+html.light #mobile-top-header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.light #app-top-header #sidebar-toggle-btn,
+html.light #mobile-top-header #mobile-menu-btn {
+  background-color: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+html.light #app-top-header #sidebar-toggle-btn:hover,
+html.light #mobile-top-header #mobile-menu-btn:hover {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+html.light #top-header-view-title {
+  color: #0F172A !important;
+}
+
+html.light #sidebar-user-card {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light #sidebar-user-card:hover {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+}
+
+html.light #sidebar-user-card h4 {
+  color: #0F172A !important;
+}
+
+html.light .sidebar-group-title {
+  color: #64748B !important;
+}
+
+html.light .sidebar-nav .nav-link {
+  color: #475569 !important;
+}
+
+html.light .sidebar-nav .nav-link:hover {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+html.light .sidebar-nav .nav-link.active {
+  color: #0284C7 !important;
+  background-color: #E0F2FE !important;
+  border-left-color: #0284C7 !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12) !important;
+}
+
+html.light .sidebar-nav .nav-link.active i {
+  color: #0284C7 !important;
+}
+
+html.light #sidebar-footer-box {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
